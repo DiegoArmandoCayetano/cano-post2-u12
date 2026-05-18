@@ -1,165 +1,181 @@
-# 🚀 Cano Post 1 - U12 | Spring Boot + Docker + Railway
+# Mi Spring App
 
-Proyecto de despliegue de una aplicación Spring Boot utilizando Docker multi-stage, Docker Compose con PostgreSQL y despliegue en Railway con variables de entorno.
+![CI/CD Status](https://github.com/DiegoArmandoCayetano/cano-post2-u12/actions/workflows/ci.yml/badge.svg)
+
+## Descripción
+
+Proyecto desarrollado en Spring Boot para implementar un pipeline completo de CI/CD utilizando GitHub Actions y Docker Hub.
+
+Este proyecto automatiza:
+
+- Compilación con Maven
+- Ejecución de pruebas automáticas
+- Generación del reporte de cobertura JaCoCo
+- Construcción de imagen Docker con multi-stage build
+- Publicación automática en Docker Hub
 
 ---
 
-## 👨‍💻 Autor
-Diego Armando Cayetano  
-Ingeniería de Sistemas - 2026
+## Tecnologías Utilizadas
 
----
-
-## 📌 Tecnologías utilizadas
-
-- Java 21 (Spring Boot)
+- Java 21
+- Spring Boot
 - Maven
-- Docker (multi-stage build)
-- Docker Compose
-- PostgreSQL 16
-- Railway (deploy cloud)
+- Docker
+- GitHub Actions
+- JaCoCo
+- Docker Hub
 
 ---
 
-## 📁 Estructura del proyecto
+## Pipeline CI/CD
 
+El workflow se ejecuta automáticamente en cada `push` a la rama `main`.
 
-cano-post1-u12/
+### Job 1 — build-and-test
+
+Este job realiza:
+
+- Checkout del código
+- Configuración de Java 21
+- Caché Maven
+- Compilación del proyecto
+- Ejecución de pruebas
+- Generación de cobertura JaCoCo
+- Publicación del reporte como artifact
+
+### Job 2 — docker-publish
+
+Este job depende de `build-and-test` y realiza:
+
+- Login en Docker Hub mediante GitHub Secrets
+- Construcción automática de la imagen Docker
+- Publicación automática en Docker Hub
+- Generación de tags:
+
+```text
+latest
+sha-<commit>
+```
+
+---
+
+## GitHub Secrets Requeridos
+
+Los Secrets configurados en GitHub fueron:
+
+```text
+DOCKERHUB_USERNAME
+DOCKERHUB_TOKEN
+```
+
+Estos Secrets permiten autenticar GitHub Actions con Docker Hub de forma segura sin exponer credenciales en el workflow YAML.
+
+---
+
+## Imagen Docker
+
+### Descargar imagen
+
+```bash
+docker pull TUUSUARIO/mi-spring-app:latest
+```
+
+### Ejecutar contenedor
+
+```bash
+docker run -p 8080:8080 TUUSUARIO/mi-spring-app:latest
+```
+
+---
+
+# Evidencias del Proyecto
+
+## Pipeline GitHub Actions Exitoso
+
+Se evidencia la ejecución completa del workflow con ambos jobs en estado exitoso.
+
+![Pipeline Success](docs/actions_pipeline_success.PNG)
+
+---
+
+## Publicación Docker Publish
+
+Se evidencia la construcción y publicación automática de la imagen.
+
+![Docker Publish](docs/docker-publish.PNG)
+
+---
+
+## GitHub Secrets Configurados
+
+Se muestran los Secrets requeridos para autenticación con Docker Hub.
+
+![GitHub Secrets](docs/github_secrets.PNG)
+
+---
+
+## Docker Hub Access Token
+
+Token generado para integración segura con GitHub Actions.
+
+![DockerHub Token](docs/dockerhub_token.PNG)
+
+---
+
+## Artifact JaCoCo
+
+Reporte JaCoCo generado y publicado correctamente como artifact descargable.
+
+![JaCoCo Artifact](docs/jacoco_artifact.PNG)
+
+---
+
+## Docker Hub Tags
+
+Imagen publicada correctamente con los tags `latest` y `sha`.
+
+![DockerHub Tags](docs/dockerhub_tags.PNG)
+
+---
+
+## Estructura del Proyecto
+
+```text
+cano-post2-u12/
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
+├── docs/
+│   ├── actions_pipeline_success.PNG
+│   ├── docker-publish.PNG
+│   ├── dockerhub_tags.PNG
+│   ├── dockerhub_token.PNG
+│   ├── github_secrets.PNG
+│   └── jacoco_artifact.PNG
+│
 ├── src/
-├── docs/ ← capturas del laboratorio
 ├── Dockerfile
-├── docker-compose.yml
-├── .dockerignore
 ├── pom.xml
 └── README.md
-
-
----
-
-# 🐳 Parte 1: Dockerfile Multi-Stage
-
-Se implementó un Dockerfile con dos etapas:
-
-- Builder (compilación con Maven + JDK)
-- Runtime (solo JRE optimizado)
-
-### 📦 Evidencia de build
-![Docker Build](docs/docker-build.PNG)
-
-### 📦 Imágenes generadas
-![Docker Images](docs/docker-images.PNG)
-
----
-
-# 🧹 .dockerignore
-
-Se excluyen archivos innecesarios para optimizar el build:
-
-- target/
-- .git/
-- .idea/
-
----
-
-# ⚙️ Parte 2: Docker Compose + PostgreSQL
-
-Se configuró un entorno local con:
-
-- Aplicación Spring Boot
-- Base de datos PostgreSQL
-- Variables de entorno para producción
-
-### 🐘 Servicios levantados
-![Compose Up](docs/compose-up.PNG)
-
-### 📊 Estado de contenedores
-![Compose PS](docs/compose-ps.PNG)
-
----
-
-# 🧪 Pruebas locales
-
-### ✔ Health check
-http://localhost:8080/actuator/health
-
-![Health Local](docs/health-local.PNG)
-
-### ✔ App funcionando localmente
-![App Local](docs/app-local-funcionando.PNG)
-
----
-
-# ☁️ Parte 3: Despliegue en Railway
-
-La aplicación fue desplegada en Railway utilizando:
-
-- Dockerfile automático
-- Variables de entorno
-- PostgreSQL gestionado por Railway
-
-### 🚀 Build en Railway
-![Railway Build](docs/railway-build.PNG)
-
-### 🔐 Variables de entorno
-![Railway Variables](docs/railway-variables.PNG)
-
-
-### APP DESPLEGADA
-![App desplegada en Railway](docs/app_desplegada.PNG)
----
-
-## 🌍 URL pública
-
-👉 https://cano-post1-u12-production.up.railway.app/
-
----
-
-## 🔥 Endpoint principal
-
-```http
-GET /api/hello
-```
-
-### Respuesta:
-
-```
-Hola mundo desde Spring Boot
 ```
 
 ---
 
-## 🧠 Endpoint raíz
+## Commits Realizados
 
-```http
-GET /
-```
-
-### Respuesta:
-
-```
-Hola mundo desde Spring Boot
+```text
+ci: agregar pipeline GitHub Actions
+fix: configurar cobertura JaCoCo
+docs: agregar badge y documentacion CI/CD
 ```
 
 ---
 
-# 📊 Estado del sistema
+## Autor
 
-| Servicio | Estado |
-|----------|--------|
-| Spring Boot | OK |
-| Docker | OK |
-| PostgreSQL | OK |
-| Railway Deploy | OK |
-
----
-
-# 🧾 Conclusión
-
-El proyecto implementa correctamente:
-
-- ✔ Docker multi-stage optimizado
-- ✔ Docker Compose con PostgreSQL
-- ✔ Perfil de producción en Spring Boot
-- ✔ Variables de entorno seguras
-- ✔ Despliegue en Railway funcional
-- ✔ API REST pública funcionando
+**Diego Armando Cayetano**  
+Ingeniería de Sistemas — Programación Web  
+2026
